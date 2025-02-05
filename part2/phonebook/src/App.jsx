@@ -3,13 +3,14 @@ import axios from 'axios'
 import FilterTextBox from './filterBox';
 import PersonList from './displayList';
 import AddPerson from './addPerson';
+import personServices from './personServices';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
+    personServices
+      .getAll()
       .then(response => {
         console.log('promise fulfilled')
         setPersons(response.data)
@@ -18,8 +19,7 @@ const App = () => {
 
   const [formData, setFormData] = useState({
     name: '',
-    number: '',
-    id: '',
+    number: ''
   });
 
   const [filterData, setFilterData] = useState({
@@ -40,7 +40,7 @@ const App = () => {
       />
       
       <h2>Numbers</h2>
-      <PersonList persons={persons} filterData={filterData} />
+      <PersonList persons={persons} filterData={filterData} setPersons={setPersons} />
     </div>
   );
 };

@@ -1,26 +1,41 @@
+import axios from 'axios';
 import React from 'react';
+import personServices from './personServices';
 
 const AddPerson = ({ formData, setFormData, setPersons, persons }) => {
   const addtoPhonebookSubmit = (event) => {
     event.preventDefault();
 
     if (persons.some(person => person.name === formData.name)) {
-      alert(`${formData.name} is already added to the phonebook`);
+      if (window.confirm(`${formData.name} is already in the phonebook. Do you want to update their number instead?`)) {
+        const personToUpdate = persons.find(person => person.name === formData.name);
+    
+        personServices
+          .update(personToUpdate.id, formData)
+          .then(response => {
+            setPersons(prevPersons =>
+              prevPersons.map(person =>
+                person.id === personToUpdate.id ? { ...person, ...formData } : person
+              )
+            );
+          })
+          .catch(error => {
+            console.log('fail', error);
+          });
+      }
       return;
     }
 
-    const newId = persons.length > 0 ? Math.max(...persons.map(p => p.id)) + 1 : 1;
+    personServices
+    .create({ ...formData })
+    .then(response => {
+      setPersons(persons.concat(response.data))
+      setFormData({
+        name: '',
+        number: '',
+      });
+    })
 
-    setFormData(prevState => ({
-      ...prevState,
-      id: newId
-    }));
-
-    setPersons([...persons, { ...formData, id: newId }]);
-    setFormData({
-      name: '',
-      number: ''
-    });
   };
 
   return (
