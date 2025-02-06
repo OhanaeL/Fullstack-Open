@@ -2,7 +2,7 @@ import axios from 'axios';
 import React from 'react';
 import personServices from './personServices';
 
-const AddPerson = ({ formData, setFormData, setPersons, persons }) => {
+const AddPerson = ({ formData, setFormData, setPersons, persons, setNotificationMessage }) => {
   const addtoPhonebookSubmit = (event) => {
     event.preventDefault();
 
@@ -13,6 +13,7 @@ const AddPerson = ({ formData, setFormData, setPersons, persons }) => {
         personServices
           .update(personToUpdate.id, formData)
           .then(response => {
+            setNotificationMessage({status: "success", text: formData.name+"'s number has been updated."});
             setPersons(prevPersons =>
               prevPersons.map(person =>
                 person.id === personToUpdate.id ? { ...person, ...formData } : person
@@ -20,6 +21,7 @@ const AddPerson = ({ formData, setFormData, setPersons, persons }) => {
             );
           })
           .catch(error => {
+            setNotificationMessage({status: "error", text: error.message});
             console.log('fail', error);
           });
       }
@@ -30,6 +32,7 @@ const AddPerson = ({ formData, setFormData, setPersons, persons }) => {
     .create({ ...formData })
     .then(response => {
       setPersons(persons.concat(response.data))
+      setNotificationMessage({status: "success", text: response.data.name+" has been added to the phonebook."});
       setFormData({
         name: '',
         number: '',
